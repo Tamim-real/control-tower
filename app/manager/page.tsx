@@ -1,8 +1,10 @@
 "use client";
 
 import { ReactNode, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Manrope } from "next/font/google";
 import {
+  ArrowLeft,
   FileText,
   Gauge,
   GitBranch,
@@ -101,6 +103,8 @@ function Alternatives({ items }: { items: { says: string; you: string }[] }) {
 }
 
 export default function Page() {
+  const router = useRouter();
+
   const [manager, setManager] = useState("Fahad Alshehri");
   const [driver, setDriver] = useState("Mitthun Sharma");
   const [employeeId, setEmployeeId] = useState("10013897");
@@ -138,6 +142,14 @@ export default function Page() {
     setNotes("");
   };
 
+  const handleBack = () => {
+    if (typeof window !== "undefined" && window.history.length > 1) {
+      router.back();
+    } else {
+      router.push("/");
+    }
+  };
+
   const input = (label: string, value: string, set: (v: string) => void, ph: string) => (
     <label className="block">
       <span className="mb-1 block text-xs font-semibold text-slate-500">{label}</span>
@@ -168,14 +180,23 @@ export default function Page() {
   return (
     <main className={`${font.className} min-h-screen bg-[#EDF1F5] text-[#12233B]`}>
       <header className="bg-[#12233B] text-white">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
-          <div className="flex items-center gap-3">
-            <span className="grid h-11 w-11 place-items-center rounded-xl bg-teal-500 text-[#12233B]">
-              <RadioTower className="h-6 w-6" />
-            </span>
-            <div>
-              <h1 className="text-lg font-extrabold leading-tight">Control Tower call script</h1>
-              <p className="text-sm text-slate-300">Driver safety violation · Call to fleet manager</p>
+        <div className="mx-auto flex max-w-6xl items-center gap-4 px-4 py-4 sm:px-6">
+          <button
+            onClick={handleBack}
+            aria-label="Go back"
+            className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white/10 text-white transition hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-400"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </button>
+          <div className="flex flex-1 items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <span className="grid h-11 w-11 place-items-center rounded-xl bg-teal-500 text-[#12233B]">
+                <RadioTower className="h-6 w-6" />
+              </span>
+              <div>
+                <h1 className="text-lg font-extrabold leading-tight">Control Tower call script</h1>
+                <p className="text-sm text-slate-300">Driver safety violation · Call to fleet manager</p>
+              </div>
             </div>
           </div>
         </div>

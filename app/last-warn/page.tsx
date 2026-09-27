@@ -1,6 +1,8 @@
 'use client';
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
+  ArrowLeft,
   Gauge,
   GitBranch,
   Headset,
@@ -130,6 +132,8 @@ function Alternatives({ items }: { items: { says: string; you: string }[] }) {
 }
 
 export default function App() {
+  const router = useRouter();
+
   const [manager, setManager] = useState("Fahad Alshehri");
   const [driver, setDriver] = useState("Mitthun Sharma");
   const [employeeId, setEmployeeId] = useState("10013897");
@@ -167,6 +171,14 @@ export default function App() {
     setBranch(null);
     setNotes("");
     setCopied(false);
+  };
+
+  const handleBack = () => {
+    if (typeof window !== "undefined" && window.history.length > 1) {
+      router.back();
+    } else {
+      router.push("/");
+    }
   };
 
   const copyNotesToClipboard = () => {
@@ -237,6 +249,13 @@ Call Notes: ${notes || "None"}
       <header className="sticky top-0 z-30 bg-[#12233B] text-white shadow-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3.5 sm:px-6">
           <div className="flex items-center gap-3">
+            <button
+              onClick={handleBack}
+              aria-label="Go back"
+              className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-white/10 text-white transition hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-red-400"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </button>
             <span className="grid h-10 w-10 place-items-center rounded-xl bg-red-600 text-white shadow-inner">
               <ShieldX className="h-6 w-6" />
             </span>

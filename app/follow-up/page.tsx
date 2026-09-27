@@ -1,8 +1,10 @@
 "use client";
 
 import { ReactNode, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Manrope } from "next/font/google";
 import {
+  ArrowLeft,
   FileText,
   Gauge,
   GitBranch,
@@ -16,12 +18,13 @@ import {
   ThumbsUp,
   UserCheck,
   UserRound,
-  AlertTriangle,
+  Car,
+  IdCard,
 } from "lucide-react";
 
 const font = Manrope({ subsets: ["latin"] });
 
-type Branch = "counselled" | "will_talk" | null;
+type Branch = "no" | "details" | null;
 
 interface ViolationsState {
   mobile: boolean;
@@ -30,7 +33,7 @@ interface ViolationsState {
   maxSpeed: boolean;
 }
 
-/* Filled value = teal. Missing value = amber [placeholder] */
+/* Filled value = teal. Missing value = amber [placeholder], so the agent never reads a blank. */
 const Token = ({ v, ph }: { v: string; ph: string }) =>
   v.trim() ? (
     <span className="font-bold text-teal-700">{v}</span>
@@ -79,7 +82,7 @@ const Thread = ({ children }: { children: ReactNode }) => (
   </div>
 );
 
-/* Alternative manager responses and handling */
+/* Other things a manager might say, and how to respond. */
 function Alternatives({ items }: { items: { says: string; you: string }[] }) {
   return (
     <div className="mt-5 rounded-xl border border-dashed border-slate-300 p-4">
@@ -99,7 +102,9 @@ function Alternatives({ items }: { items: { says: string; you: string }[] }) {
   );
 }
 
-export default function FollowUpCallScript() {
+export default function Page() {
+  const router = useRouter();
+
   const [manager, setManager] = useState("Fahad Alshehri");
   const [driver, setDriver] = useState("Mitthun Sharma");
   const [employeeId, setEmployeeId] = useState("10013897");
@@ -137,6 +142,14 @@ export default function FollowUpCallScript() {
     setNotes("");
   };
 
+  const handleBack = () => {
+    if (typeof window !== "undefined" && window.history.length > 1) {
+      router.back();
+    } else {
+      router.push("/");
+    }
+  };
+
   const input = (label: string, value: string, set: (v: string) => void, ph: string) => (
     <label className="block">
       <span className="mb-1 block text-xs font-semibold text-slate-500">{label}</span>
@@ -156,7 +169,7 @@ export default function FollowUpCallScript() {
     if (violations.driverSeatbelt) list.push("driver seatbelt violation");
     if (violations.passengerSeatbelt) list.push("passenger seatbelt violation");
 
-    if (list.length === 0) return "repeated safety violations";
+    if (list.length === 0) return "";
     if (list.length === 1) return list[0];
     if (list.length === 2) return `${list[0]} and ${list[1]}`;
     return `${list.slice(0, -1).join(", ")}, and ${list[list.length - 1]}`;
@@ -166,24 +179,30 @@ export default function FollowUpCallScript() {
 
   return (
     <main className={`${font.className} min-h-screen bg-[#EDF1F5] text-[#12233B]`}>
-      {/* Header */}
       <header className="bg-[#12233B] text-white">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
-          <div className="flex items-center gap-3">
-            <span className="grid h-11 w-11 place-items-center rounded-xl bg-teal-500 text-[#12233B]">
-              <RadioTower className="h-6 w-6" />
-            </span>
-            <div>
-              <h1 className="text-lg font-extrabold leading-tight">Control Tower Follow-Up Call Script</h1>
-              <p className="text-sm text-slate-300">Repeated Driver Safety Violation · Follow-up call to fleet manager</p>
+        <div className="mx-auto flex max-w-6xl items-center gap-4 px-4 py-4 sm:px-6">
+          <button
+            onClick={handleBack}
+            aria-label="Go back"
+            className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white/10 text-white transition hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-400"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </button>
+          <div className="flex flex-1 items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <span className="grid h-11 w-11 place-items-center rounded-xl bg-teal-500 text-[#12233B]">
+                <RadioTower className="h-6 w-6" />
+              </span>
+              <div>
+                <h1 className="text-lg font-extrabold leading-tight">Control Tower call script</h1>
+                <p className="text-sm text-slate-300">Driver safety violation · Call to fleet manager</p>
+              </div>
             </div>
           </div>
         </div>
       </header>
 
-      {/* Grid Layout */}
       <div className="mx-auto grid max-w-6xl gap-6 px-4 py-6 sm:px-6 lg:grid-cols-[280px_minmax(0,1fr)]">
-        {/* Left Sidebar Form */}
         <aside className="space-y-5 lg:sticky lg:top-6 lg:self-start">
           <section className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
             <h2 className="mb-3 text-sm font-bold">Fill in before you call</h2>
@@ -193,7 +212,7 @@ export default function FollowUpCallScript() {
               {input("Employee ID", employeeId, setEmployeeId, "e.g. EMP-9821")}
               {input("License Plate / Vehicle No.", licensePlate, setLicensePlate, "e.g. KAZ-4820")}
 
-              {/* Violations Selection */}
+              {/* Violations selection */}
               <div>
                 <span className="mb-1.5 block text-xs font-semibold text-slate-500">Violations observed</span>
                 <div className="space-y-2 rounded-lg border border-slate-200 bg-slate-50/50 p-2.5">
@@ -236,8 +255,8 @@ export default function FollowUpCallScript() {
                 </div>
               </div>
 
-              {input("Speeding detail (optional)", speed, setSpeed, "e.g. 85 km/h in a 60 zone")}
-              {input("Phone use detail (optional)", phone, setPhone, "e.g. 3 events in 15 min")}
+              {input("Speeding detail (optional)", speed, setSpeed, "e.g. 82 km/h in a 60 zone")}
+              {input("Phone use detail (optional)", phone, setPhone, "e.g. 2 events in 20 min")}
             </div>
           </section>
 
@@ -250,14 +269,13 @@ export default function FollowUpCallScript() {
           </div>
         </aside>
 
-        {/* Script Flow */}
         <div className="space-y-5">
-          {/* Section 1: Greeting */}
+          {/* Greeting Section */}
           <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">
             <Thread>
               <Line who="agent" tag="Read aloud">
-                Hello! Good evening! This is Sakib from the Control Tower. Am I speaking with{" "}
-                <Token v={manager} ph="Manager's name" />?
+                Hello! Good evening! This is Sakib from the Control Tower. Am I speaking
+                with <Token v={manager} ph="Manager's name" />?
               </Line>
               <Line who="manager" tag="Expected reply">
                 &ldquo;Yes, speaking! How can I help you?&rdquo;
@@ -265,41 +283,39 @@ export default function FollowUpCallScript() {
             </Thread>
             <Alternatives
               items={[
-                { says: "Who is this?", you: "Politely state your name and explain that you are calling from the Control Tower regarding a follow-up." },
+                { says: "Who is this?", you: "Say your name again and that you are calling from the Control Tower." },
                 {
                   says: "I'm not the manager.",
-                  you: "Politely ask for the manager or ask when would be a good time to call back. Do not share driver details.",
+                  you: "Ask politely for the manager or a good time to call back. Do not share any driver details.",
                 },
                 {
                   says: "I'm busy right now.",
-                  you: "Apologize for the interruption and ask if you can talk for just one minute, or offer to call back at a better time.",
+                  you: "Apologise for the interruption and offer to keep it short or call back at a time that suits them.",
                 },
               ]}
             />
           </section>
 
-          {/* Section 2: Follow-Up Reason & Question */}
+          {/* Explanation Section */}
           <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">
             <Thread>
               <Line who="agent" tag="Read aloud">
                 <div className="space-y-3">
                   <p>
-                    I am calling to follow up regarding your driver, <Token v={driver} ph="Driver's name" /> (ID:{" "}
-                    <Token v={employeeId} ph="Employee ID" />), who drives vehicle{" "}
-                    <Token v={licensePlate} ph="Vehicle No." />.
-                  </p>
-                  <p>
-                    We noticed that he is still continuously committing safety violations, such as{" "}
+                    I&apos;m calling to let you know about a safety issue with one of your drivers,{" "}
+                    <Token v={driver} ph="Driver's name" /> (ID: <Token v={employeeId} ph="Employee ID" />), driving vehicle{" "}
+                    <Token v={licensePlate} ph="Vehicle No." />. Our system flagged him with a few violations, like{" "}
                     <Token v={selectedViolationsSummary} ph="violations observed" />.
                   </p>
                   <p>
-                    Since safety is very important to us, what steps or counselling have you taken regarding this?
+                    Because safety is so important, we would really appreciate your help in talking to him about this.
+                    Also, if you have any questions at all, please feel free to ask me!
                   </p>
                 </div>
               </Line>
             </Thread>
 
-            {/* Violation Badges */}
+            {/* Violation Cards Display */}
             <div className="mt-4 grid gap-2 sm:grid-cols-2">
               <div
                 className={`flex items-center gap-3 rounded-xl p-3 ring-1 ${
@@ -309,7 +325,7 @@ export default function FollowUpCallScript() {
                 }`}
               >
                 <Gauge className="h-5 w-5" />
-                <span className="text-sm font-semibold">Continuous Speeding</span>
+                <span className="text-sm font-semibold">Driving over the speed limit</span>
               </div>
               <div
                 className={`flex items-center gap-3 rounded-xl p-3 ring-1 ${
@@ -319,7 +335,7 @@ export default function FollowUpCallScript() {
                 }`}
               >
                 <Smartphone className="h-5 w-5" />
-                <span className="text-sm font-semibold">Phone Use While Driving</span>
+                <span className="text-sm font-semibold">Using phone while driving</span>
               </div>
               <div
                 className={`flex items-center gap-3 rounded-xl p-3 ring-1 ${
@@ -329,7 +345,7 @@ export default function FollowUpCallScript() {
                 }`}
               >
                 <UserCheck className="h-5 w-5" />
-                <span className="text-sm font-semibold">Driver Seatbelt Violation</span>
+                <span className="text-sm font-semibold">Driver seatbelt violation</span>
               </div>
               <div
                 className={`flex items-center gap-3 rounded-xl p-3 ring-1 ${
@@ -339,38 +355,30 @@ export default function FollowUpCallScript() {
                 }`}
               >
                 <ShieldAlert className="h-5 w-5" />
-                <span className="text-sm font-semibold">Passenger Seatbelt Violation</span>
+                <span className="text-sm font-semibold">Passenger seatbelt violation</span>
               </div>
             </div>
 
             <p className="mt-4 text-sm text-slate-500">
-              Maintain a calm and collaborative tone. Listen to the manager&apos;s response, then click the matching option below.
+              Stay calm and supportive. You are asking for help, not blaming. Pause, then let the manager reply.
             </p>
           </section>
 
-          {/* Section 3: Manager Response Branching */}
+          {/* Manager Response Branching Section */}
           <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">
-            <p className="mb-3 text-sm font-semibold text-slate-600">Listen, then tap what the manager said:</p>
+            <p className="mb-3 text-sm font-semibold text-slate-600">Listen, then tap what the manager said.</p>
             <div className="space-y-3">
               {(
                 [
-                  [
-                    "counselled",
-                    ThumbsUp,
-                    "I talked with him and counselled him. He assured me he will not do it again.",
-                  ],
-                  [
-                    "will_talk",
-                    AlertTriangle,
-                    "Alright, I will talk to him again and take necessary action.",
-                  ],
+                  ["no", ThumbsUp, "No questions, I will talk to him."],
+                  ["details", FileText, "Yes, can you share the details?"],
                 ] as const
               ).map(([key, Icon, label]) => (
                 <button
                   key={key}
                   onClick={() => setBranch(key)}
                   aria-pressed={branch === key}
-                  className={`flex w-full items-center gap-3 rounded-2xl p-4 text-left transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600 ${
+                  className={`flex w-full items-center gap-3 rounded-2xl p-4 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600 ${
                     branch === key
                       ? "bg-[#12233B] text-white ring-2 ring-[#12233B]"
                       : "bg-slate-100 text-slate-700 ring-1 ring-slate-200 hover:bg-slate-200/70"
@@ -383,64 +391,97 @@ export default function FollowUpCallScript() {
               ))}
             </div>
 
-            {/* Branch 1 Response */}
-            {branch === "counselled" && (
+            {branch === "no" && (
               <div className="mt-5">
                 <Thread>
                   <Line who="agent" tag="Read aloud">
-                    <p>
-                      Thank you so much for talking to him and counselling him! We really appreciate your proactive support.
-                    </p>
-                    <p className="mt-2">
-                      We will continue to monitor his driving performance over the next few days to make sure he maintains safe habits.
-                    </p>
+                    Thank you. Please talk to him about it.
+                    <span className="mt-1 block text-sm text-slate-500">
+                      Suggested wording.
+                    </span>
                   </Line>
                 </Thread>
               </div>
             )}
 
-            {/* Branch 2 Response */}
-            {branch === "will_talk" && (
+            {branch === "details" && (
               <div className="mt-5">
                 <Thread>
                   <Line who="agent" tag="Read aloud">
                     <p>
-                      Thank you so much, <Token v={manager} ph="Manager's name" />! That will be very helpful.
+                      Of course. Our system recorded this for <Token v={driver} ph="Driver's name" /> (ID:{" "}
+                      <Token v={employeeId} ph="Employee ID" />) operating vehicle <Token v={licensePlate} ph="Vehicle No." />:
                     </p>
-                    <p className="mt-2">
-                      Please remind him that road safety is our priority, and we hope to see immediate improvement on his upcoming trips.
-                    </p>
+                    <ul className="mt-3 space-y-2 text-base">
+                      {violations.maxSpeed && (
+                        <li className="flex items-start gap-3">
+                          <Gauge className="mt-1 h-5 w-5 shrink-0 text-red-600" />
+                          <span>
+                            Driving over the speed limit: <Token v={speed} ph="speeding detail" />
+                          </span>
+                        </li>
+                      )}
+                      {violations.mobile && (
+                        <li className="flex items-start gap-3">
+                          <Smartphone className="mt-1 h-5 w-5 shrink-0 text-amber-600" />
+                          <span>
+                            Using phone while driving: <Token v={phone} ph="phone use detail" />
+                          </span>
+                        </li>
+                      )}
+                      {violations.driverSeatbelt && (
+                        <li className="flex items-start gap-3">
+                          <UserCheck className="mt-1 h-5 w-5 shrink-0 text-amber-600" />
+                          <span>Driver seatbelt was unfastened during transit</span>
+                        </li>
+                      )}
+                      {violations.passengerSeatbelt && (
+                        <li className="flex items-start gap-3">
+                          <ShieldAlert className="mt-1 h-5 w-5 shrink-0 text-amber-600" />
+                          <span>Passenger seatbelt violation detected</span>
+                        </li>
+                      )}
+                    </ul>
+                    <p className="mt-3">Do you have any other questions?</p>
+                  </Line>
+                  <Line who="manager" tag="Likely reply">
+                    &ldquo;No, thank you. I will talk to him.&rdquo;
                   </Line>
                 </Thread>
+                <p className="mt-3 text-sm text-slate-500">
+                  Suggested wording, not in the original script. Share only the facts you filled in on the left. If you
+                  do not know something, say you will check. Do not guess.
+                </p>
               </div>
             )}
           </section>
 
-          {/* Section 4: Closing & Farewell */}
+          {/* Closure Section */}
           <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">
             <Thread>
               <Line who="agent" tag="Read aloud">
-                Thank you so much for your time and cooperation today. You can always call us back on this number if you need anything else. Have a great day ahead!
+                Perfect! Thank you so much for your time and help today. You can always call us back on this number if
+                you need anything else. Have a great day ahead!
               </Line>
               <Line who="manager" tag="Likely reply">
-                &ldquo;Thank you. Goodbye!&rdquo;
+                &ldquo;Thank you. Goodbye.&rdquo;
               </Line>
             </Thread>
-            <p className="mt-4 text-sm text-slate-500">Let the manager end the call first, then save your call notes below.</p>
+            <p className="mt-4 text-sm text-slate-500">Let the manager end the call first, then log the outcome below.</p>
           </section>
 
-          {/* Section 5: Call Notes & Reset */}
+          {/* Call Notes Section */}
           <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">
             <div className="mb-3 flex items-center justify-between">
               <h2 className="flex items-center gap-2 text-lg font-extrabold">
-                <PhoneCall className="h-5 w-5 text-teal-600" /> Follow-Up Call Notes
+                <PhoneCall className="h-5 w-5 text-teal-600" /> Call notes
               </h2>
             </div>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={3}
-              placeholder="Manager's reply, action taken, promised follow-up..."
+              placeholder="Manager's reply, promised actions, follow-up needed…"
               className="w-full rounded-lg border border-slate-200 p-3 text-sm outline-none placeholder:text-slate-400 focus:border-teal-600 focus:ring-2 focus:ring-teal-600/20"
             />
             <button
