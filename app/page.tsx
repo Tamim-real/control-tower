@@ -11,37 +11,17 @@ import {
   RadioTower,
   Search,
   ShieldX,
-  UserCheck,
 } from "lucide-react";
 
 const font = Manrope({ subsets: ["latin"] });
 
-type Filter = "all" | "driver" | "manager";
+type Filter = "all" | "manager";
 
 const MODULES = [
   {
-    id: "driver_comm",
-    href: "/driver",
-    step: 1,
-    short: "Driver alert",
-    title: "Driver Communication",
-    subtitle: "Direct safety call to the driver",
-    category: "driver" as const,
-    badge: "Initial warning",
-    description:
-      "Direct warning call to the driver to stop speeding, mobile phone use or seatbelt violations before escalating.",
-    audience: "Active field drivers",
-    icon: UserCheck,
-    bar: "bg-teal-500",
-    tile: "bg-teal-50 text-teal-700",
-    chip: "bg-teal-50 text-teal-800 ring-teal-200",
-    num: "bg-teal-500",
-    hover: "hover:ring-teal-500",
-  },
-  {
     id: "manager_comm",
     href: "/manager",
-    step: 2,
+    step: 3,
     short: "Manager notice",
     title: "Manager Communication",
     subtitle: "First-stage escalation call",
@@ -60,9 +40,9 @@ const MODULES = [
   {
     id: "followup_step3",
     href: "/follow-up",
-    step: 3,
+    step: 4,
     short: "Follow-up check",
-    title: "Follow-up Step 3",
+    title: "Follow-up Step 4",
     subtitle: "Compliance and re-check call",
     category: "manager" as const,
     badge: "Compliance follow-up",
@@ -79,7 +59,7 @@ const MODULES = [
   {
     id: "final_warning",
     href: "/last-warn",
-    step: 4,
+    step: 5,
     short: "Final notice",
     title: "Final Warning",
     subtitle: "HR and department head escalation",
@@ -103,16 +83,15 @@ export default function Home() {
 
   const count = (f: Filter) =>
     f === "all" ? MODULES.length : MODULES.filter((m) => m.category === f).length;
-  
+
   const list = MODULES.filter(
     (m) =>
       (filter === "all" || m.category === filter) &&
       `${m.title} ${m.description}`.toLowerCase().includes(q.trim().toLowerCase())
   );
-  
+
   const tabs: [Filter, string][] = [
     ["all", "All calls"],
-    ["driver", "Driver calls"],
     ["manager", "Manager calls"],
   ];
 

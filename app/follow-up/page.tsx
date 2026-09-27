@@ -100,20 +100,20 @@ function Alternatives({ items }: { items: { says: string; you: string }[] }) {
 }
 
 export default function FollowUpCallScript() {
-  const [manager, setManager] = useState("");
-  const [driver, setDriver] = useState("");
-  const [employeeId, setEmployeeId] = useState("");
-  const [licensePlate, setLicensePlate] = useState("");
+  const [manager, setManager] = useState("Fahad Alshehri");
+  const [driver, setDriver] = useState("Mitthun Sharma");
+  const [employeeId, setEmployeeId] = useState("10013897");
+  const [licensePlate, setLicensePlate] = useState("2292-HRB");
   const [speed, setSpeed] = useState("");
   const [phone, setPhone] = useState("");
   const [branch, setBranch] = useState<Branch>(null);
   const [notes, setNotes] = useState("");
 
   const [violations, setViolations] = useState<ViolationsState>({
-    mobile: false,
+    mobile: true,
     passengerSeatbelt: false,
     driverSeatbelt: false,
-    maxSpeed: false,
+    maxSpeed: true,
   });
 
   const toggleViolation = (key: keyof ViolationsState) => {

@@ -101,20 +101,20 @@ function Alternatives({ items }: { items: { says: string; you: string }[] }) {
 }
 
 export default function Page() {
-  const [manager, setManager] = useState("");
-  const [driver, setDriver] = useState("");
-  const [employeeId, setEmployeeId] = useState("");
-  const [licensePlate, setLicensePlate] = useState("");
+  const [manager, setManager] = useState("Fahad Alshehri");
+  const [driver, setDriver] = useState("Mitthun Sharma");
+  const [employeeId, setEmployeeId] = useState("10013897");
+  const [licensePlate, setLicensePlate] = useState("2292-HRB");
   const [speed, setSpeed] = useState("");
   const [phone, setPhone] = useState("");
   const [branch, setBranch] = useState<Branch>(null);
   const [notes, setNotes] = useState("");
 
   const [violations, setViolations] = useState<ViolationsState>({
-    mobile: false,
+    mobile: true,
     passengerSeatbelt: false,
     driverSeatbelt: false,
-    maxSpeed: false,
+    maxSpeed: true,
   });
 
   const toggleViolation = (key: keyof ViolationsState) => {
@@ -167,7 +167,6 @@ export default function Page() {
 
   return (
     <main className={`${font.className} min-h-screen bg-[#EDF1F5] text-[#12233B]`}>
-      {}
       <header className="bg-[#12233B] text-white">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
           <div className="flex items-center gap-3">
@@ -182,9 +181,7 @@ export default function Page() {
         </div>
       </header>
 
-      {}
       <div className="mx-auto grid max-w-6xl gap-6 px-4 py-6 sm:px-6 lg:grid-cols-[280px_minmax(0,1fr)]">
-        {}
         <aside className="space-y-5 lg:sticky lg:top-6 lg:self-start">
           <section className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
             <h2 className="mb-3 text-sm font-bold">Fill in before you call</h2>
@@ -193,7 +190,7 @@ export default function Page() {
               {input("Driver name", driver, setDriver, "Driver's name")}
               {input("Employee ID", employeeId, setEmployeeId, "e.g. EMP-9821")}
               {input("License Plate / Vehicle No.", licensePlate, setLicensePlate, "e.g. KAZ-4820")}
-              
+
               {/* Violations selection */}
               <div>
                 <span className="mb-1.5 block text-xs font-semibold text-slate-500">Violations observed</span>
@@ -251,7 +248,6 @@ export default function Page() {
           </div>
         </aside>
 
-        {}
         <div className="space-y-5">
           {/* Greeting Section */}
           <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">
@@ -287,7 +283,7 @@ export default function Page() {
                   <p>
                     I&apos;m calling to let you know about a safety issue with one of your drivers,{" "}
                     <Token v={driver} ph="Driver's name" /> (ID: <Token v={employeeId} ph="Employee ID" />), driving vehicle{" "}
-                    <Token v={licensePlate} ph="Vehicle No." />. Our system caught him with a few violations, like{" "}
+                    <Token v={licensePlate} ph="Vehicle No." />. Our system flagged him with a few violations, like{" "}
                     <Token v={selectedViolationsSummary} ph="violations observed" />.
                   </p>
                   <p>
